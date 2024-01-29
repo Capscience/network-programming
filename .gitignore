@@ -1,6 +1,9 @@
 # Binary name used for the exercises
 exercise
 
+# Exercise return tarballs
+*.tar*
+
 # Prerequisites
 *.d
 
