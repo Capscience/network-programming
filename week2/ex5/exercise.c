@@ -13,9 +13,12 @@ int reader(int fd_in, int fd_out)
 	int bytes_read;
 	bool line_ended = true;
 
+	// Read line from fd_in
 	while ((bytes_read = read(fd_in, buf, MAX_LEN))) {
+		// This if ignores too long lines
 		if (buf[bytes_read - 1] == *"\n") {
 			if (line_ended)
+				// Write to fd_out if line not too long
 				write(fd_out, buf, bytes_read);
 			line_ended = true;
 		} else {
@@ -23,7 +26,6 @@ int reader(int fd_in, int fd_out)
 		}
 	}
 
-	// Failure if buffer not large enough or file empty
 	free(buf);
 	return -1;
 }
@@ -54,9 +56,11 @@ int main(int argc, char *argv[])
 	}
 
 	if (pid == 0) {
+		// Parent
 		close(pipe1[0]);
 		reader(STDIN_FILENO, pipe1[1]);
 	} else {
+		// Child
 		close(pipe1[1]);
 		doubler(pipe1[0], STDOUT_FILENO);
 	}
