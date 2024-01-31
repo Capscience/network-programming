@@ -14,10 +14,12 @@ int lower_server(int fd_in, int fd_out)
 {
 	char *buf = malloc(100 * sizeof(char));
 	int bytes_read;
+	// Read from request fifo
 	while ((bytes_read = read(fd_in, buf, MAX_LEN)) != -1) {
 		for (int i = 0; i < bytes_read; i++) {
 			buf[i] = tolower(buf[i]);
 		}
+		// Write to answer fifo
 		write(fd_out, buf, bytes_read);
 	}
 	free(buf);
