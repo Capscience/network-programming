@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,5 +39,9 @@ int main(int argc, char *argv[])
 		int n = sprintf(str, "%d: i = %d \n", pid, i);
 		write(STDOUT_FILENO, str, n);
 	}
+
+	if (pid != 0)
+		waitpid(pid, 0, 0);
+
 	exit(0);
 }

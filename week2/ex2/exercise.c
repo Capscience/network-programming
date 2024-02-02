@@ -12,7 +12,12 @@ void usage()
 
 int do_child(char *path, char *arg)
 {
-	int ret = execv(path, &arg);
+	char *argv[3];
+	argv[0] = path;
+	argv[1] = arg;
+	argv[2] = NULL;
+
+	int ret = execv(path, argv);
 	return ret;
 }
 
@@ -28,8 +33,8 @@ int main(int argc, char *argv[])
 		exit(1);
 
 	if (pid == 0) {
-		for (i = 1; i < argc; i++)
-			printf("%s\n", argv[i]);
+		for (i = 1; i < 5; i++)
+			printf("%d\n", i);
 	} else {
 		do_child(argv[1], argv[2]);
 	}
