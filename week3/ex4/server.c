@@ -1,0 +1,81 @@
+#include <fcntl.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+
+#define BUF_SIZE 100
+#define PORT 50420
+
+int doubler(int fd_in, int fd_out)
+{
+	char *buf = malloc(BUF_SIZE);
+	char *writebuf = malloc(BUF_SIZE);
+	int bytes_read;
+	int w_index = 0;
+	bool too_long = false;
+
+	// Read from stdin
+	while ((bytes_read = read(fd_in, buf, BUF_SIZE)) > 0) {
+		for (int i = 0; i < bytes_read; i++) {
+			if (w_index >= 100) {
+				too_long = true;
+			}
+			if (!too_long)
+				writebuf[w_index++] = buf[i];
+			if (buf[i] == *"\n") {
+				if (!too_long) {
+					write(fd_out, writebuf, w_index);
+					write(fd_out, writebuf, w_index);
+				}
+				w_index = 0;
+				too_long = false;
+			}
+		}
+	}
+
+	free(buf);
+	free(writebuf);
+	return -1;
+}
+
+int main(int argc, char *argv[])
+{
+	int server_fd, client_fd;
+	struct sockaddr_in server, client;
+
+	if ((server_fd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("Socket creation failed!");
+		exit(1);
+	}
+
+	server.sin_addr.s_addr = htonl(INADDR_ANY);
+	server.sin_family = PF_INET;
+	server.sin_port = PORT;
+
+	if (bind(server_fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
+		perror("Bind failed!");
+		exit(1);
+	}
+
+	if (listen(server_fd, 8) < 0) {
+		perror("Bind failed!");
+		exit(1);
+	}
+
+	for (;;) {
+		socklen_t client_len = sizeof(client);
+		if ((client_fd = accept(server_fd, (struct sockaddr *)&client,
+					&client_len)) < 0) {
+			perror("Accept failed!");
+			exit(1);
+		}
+
+		doubler(client_fd, STDOUT_FILENO);
+	}
+
+	return EXIT_SUCCESS;
+}
