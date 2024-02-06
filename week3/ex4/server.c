@@ -18,7 +18,7 @@ int doubler(int fd_in, int fd_out)
 	int w_index = 0;
 	bool too_long = false;
 
-	// Read from stdin
+	// Read from stdin (well actually a TCP socket)
 	while ((bytes_read = read(fd_in, buf, BUF_SIZE)) > 0) {
 		for (int i = 0; i < bytes_read; i++) {
 			if (w_index >= 100) {
@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 {
 	int server_fd, client_fd;
 	struct sockaddr_in server, client;
+	pid_t childpid;
 
 	if ((server_fd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 		perror("Socket creation failed!");
@@ -73,8 +74,14 @@ int main(int argc, char *argv[])
 			perror("Accept failed!");
 			exit(1);
 		}
-
-		doubler(client_fd, STDOUT_FILENO);
+		if ((childpid = fork()) < 0)
+			perror("Fork failed!");
+		else if (childpid == 0) {
+			close(server_fd);
+			doubler(client_fd, STDOUT_FILENO);
+			exit(0);
+		}
+		close(client_fd);
 	}
 
 	return EXIT_SUCCESS;
