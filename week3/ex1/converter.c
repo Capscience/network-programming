@@ -26,7 +26,7 @@ int converter(int fd_in, int fd_out)
 				too_long = true;
 			}
 			if (!too_long)
-				writebuf[w_index++] = tolower(buf[i]);
+				writebuf[w_index++] = toupper(buf[i]);
 			if (buf[i] == *"\n") {
 				if (!too_long) {
 					write(fd_out, writebuf, w_index);
