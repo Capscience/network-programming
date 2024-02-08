@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define BUF_SIZE 100
 #define PORT 50420
@@ -78,15 +79,16 @@ int main(int argc, char *argv[])
 	}
 	unsigned long bytes = strtoul(argv[2], NULL, 10);
 	int bufsize = atoi(argv[3]);
+	addr = argv[1];
 
 	if ((server_fd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 		perror("Socket creation failed!");
 		exit(1);
 	}
 
-	server.sin_addr.s_addr = htonl(INADDR_ANY);
+	server.sin_addr.s_addr = inet_addr(addr);
 	server.sin_family = PF_INET;
-	server.sin_port = PORT;
+	server.sin_port = htons(PORT);
 
 	gettimeofday(&start, &tz);
 	if ((connect(server_fd, (struct sockaddr *)&server, sizeof(server))) <
