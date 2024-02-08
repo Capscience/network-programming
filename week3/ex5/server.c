@@ -102,9 +102,9 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	server.sin_addr.s_addr = htonl(INADDR_ANY);
+	server.sin_addr.s_addr = INADDR_ANY;
 	server.sin_family = PF_INET;
-	server.sin_port = PORT;
+	server.sin_port = htons(PORT);
 
 	if (bind(server_fd, (struct sockaddr *)&server, sizeof(server)) < 0) {
 		perror("Bind failed!");
