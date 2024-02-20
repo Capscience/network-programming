@@ -31,7 +31,7 @@ int reader(int fd_in, int sockfd)
 			if (buf[i] == *"\n") {
 				if (!too_long) {
 					write(sockfd, writebuf, w_index);
-					if (read(sockfd, writebuf, w_index) <
+					if (read(sockfd, writebuf, w_index) <=
 					    0) {
 						perror("Read error");
 						exit(EXIT_FAILURE);
